@@ -1,0 +1,24 @@
+{
+  "name": "sync-sdk-example",
+  "version": "1.0.0",
+  "description": "Sync SDK Example",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kent-displays/boogie-board-sync-chrome-sdk.git"
+  },
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/kent-displays/boogie-board-sync-chrome-sdk/issues"
+  },
+  "homepage": "https://github.com/kent-displays/boogie-board-sync-chrome-sdk",
+  "devDependencies": {
+    "grunt-vulcanize": "~0.6.1",
+    "grunt": "~0.4.5",
+    "grunt-contrib-watch": "~0.6.1"
+  }
+}

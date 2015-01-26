@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+    <title>Boogie Board Sync</title>
+
+    <script src="bower_components/webcomponentsjs/webcomponents.js"></script>
+    <script src="bower_components/underscore/underscore.js"></script>
+
+    <link rel="import" href="bower_components/core-header-panel/core-header-panel.html">
+    <link rel="import" href="bower_components/core-toolbar/core-toolbar.html">
+    <link rel="import" href="bower_components/core-animated-pages/core-animated-pages.html">
+    <link rel="import" href="bower_components/core-animated-pages/transitions/slide-from-right.html">
+    <link rel="import" href="bower_components/paper-tabs/paper-tabs.html">
+    <link rel="import" href="bower_components/paper-button/paper-button.html">
+    <link rel="import" href="elements/streaming.html">
+    <link rel="import" href="elements/file-transfer.html">
+    <link rel="stylesheet" media="all" href="css/app.css">
+    <base target="_blank">
+  </head>
+  <body unresolved>
+    <core-header-panel main>
+      <paper-tabs selected="0">
+        <paper-tab>Streaming Client</paper-tab>
+        <paper-tab>File Transfer Client</paper-tab>
+      </paper-tabs>
+      <core-animated-pages selected="0" transitions="slide-from-right">
+        <section>
+          <streaming-tag></streaming-tag>
+        </section>
+        <section>
+          <file-transfer-tag></file-transfer-tag>
+        </section>
+      </core-animated-pages>
+    </core-header-panel>
+    <script src="js/pdfjs/pdf.js"></script>
+    <script src="js/pdfjs/compatibility.js"></script>
+    <script src="js/sync-sdk/obex-ftp-utils.js"></script>
+    <script src="js/sync-sdk/obex-ftp-response.js"></script>
+    <script src="js/sync-sdk/obex-ftp-header.js"></script>
+    <script src="js/sync-sdk/obex-ftp-request.js"></script>
+    <script src="js/sync-sdk/sync-capture-report.js"></script>
+    <script src="js/sync-sdk/sync-path.js"></script>
+    <script src="js/sync-sdk/sync-filter.js"></script>
+    <script src="js/sync-sdk/sync-streaming.js"></script>
+    <script src="js/sync-sdk/sync-file-transfer.js"></script>
+    <script src="js/app.js"></script>
+  </body>
+</html>

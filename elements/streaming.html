@@ -1,0 +1,119 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../bower_components/core-item/core-item.html">
+
+<polymer-element name="streaming-tag" devices="{{devices}}">
+  <template>
+    <style>
+      #canvas {
+        background-color: white;
+        margin-top: 10px;
+      }
+    </style>
+    <div horizontal layout>
+      <div flex>
+        <div>
+          <h3>Devices</h3>
+          <template repeat="{{device in devices}}">
+            <core-item label="Device: {{device.deviceId}}">
+              <paper-button raised on-tap="{{connect}}" disabled?="{{state == 3}}">Connect</paper-button>
+              <paper-button raised on-tap="{{disconnect}}" disabled?="{{state != 3}}">Disconnect</paper-button>
+            </core-item>
+          </template>
+        </div>
+        <div>
+          <p>Connection Status: {{stateString}}</p>
+          <p>X Coordinate: {{xCoordinate}}</p>
+          <p>Y Coordinate: {{yCoordinate}}</p>
+          <p>Pressure: {{pressure}}</p>
+          <paper-button disabled?="{{state != 3}}" raised on-tap="{{erase}}">Erase</paper-button>
+          <paper-button disabled?="{{state != 3}}" raised on-tap="{{digitizer}}">Digitizer</paper-button>
+          <paper-button disabled?="{{state != 3}}" raised on-tap="{{capture}}">Capture</paper-button>
+        </div>
+      </div>
+      <div>
+        <canvas id="canvas" width="395" height="574"></canvas>
+      </div>
+    </div>
+  </template>
+  <script>
+    Polymer('streaming-tag', {
+      // initialize the element's model
+      ready: function() {
+        this.xCoordinate = 'N/A'
+        this.yCoordinate = 'N/A'
+        this.pressure = 'N/A'
+        this.canvas = this.$.canvas
+        this.context = this.canvas.getContext('2d')
+        this.setupContext()
+        this.streamingManager = SyncStreamingManager.getInstance()
+        this.streamingManager.addObserver(this)
+        this.state = this.streamingManager.getState()
+        this.stateString = this.stringForState(this.state)
+        this.devices = this.streamingManager.getDevices()
+      },
+      erase: function() {
+        this.context.clearRect(0, 0, SyncStreamingManager.MAX_X, SyncStreamingManager.MAX_Y)
+        this.streamingManager.erase()
+      },
+      digitizer: function() {
+        this.streamingManager.setMode(this.streamingManager.modes.DIGITIZER)
+      },
+      capture: function() {
+        this.streamingManager.setMode(this.streamingManager.modes.CAPTURE)
+      },
+      connect: function(event, detail, sender) {
+        var device = sender.templateInstance.model.device;
+        this.streamingManager.connect(device.deviceId)
+      },
+      disconnect: function(event, detail, sender) {
+        var device = sender.templateInstance.model.device;
+        this.streamingManager.disconnect(device.deviceId)
+      },
+      setupContext: function() {
+        this.context.scale(this.canvas.width / SyncStreamingManager.MAX_Y, this.canvas.height / SyncStreamingManager.MAX_X)
+        this.context.rotate(-Math.PI / 2)
+        this.context.translate(-SyncStreamingManager.MAX_X, 0)
+        this.context.fillStyle = '#000000'
+        this.context.lineCap = 'round'
+        this.context.lineJoin = 'round'
+      },
+      stateChanged : function(oldState, newState) {
+        this.stateString = this.stringForState(newState)
+        this.state = newState
+      },
+      receivedSyncCaptureReport: function(report) {
+        this.xCoordinate = report.getX()
+        this.yCoordinate = report.getY()
+        this.pressure = report.getPressure()
+      },
+      receivedPaths: function(paths) {
+        for (var index in paths) {
+          var path = paths[index]
+          this.context.beginPath()
+          this.context.lineWidth = path.getLineWidth()
+          this.context.moveTo(path.getX1(), path.getY1())
+          this.context.lineTo(path.getX2(), path.getY2())
+          this.context.stroke()
+        }
+      },
+      updatedDevices: function() {
+        this.devices = this.streamingManager.getDevices()
+      },
+      stringForState: function(state) {
+        var states = this.streamingManager.states
+        switch(state) {
+          case states.CONNECTED:
+            return 'Connected'
+          case states.DISCONNECTED:
+            return 'Disconnected'
+          case states.CONNECTING:
+            return 'Connecting'
+          case states.DISCONNECTING:
+            return 'Disconnecting'
+        }
+        return 'N/A'
+      }
+    })
+  </script>
+</polymer-element>

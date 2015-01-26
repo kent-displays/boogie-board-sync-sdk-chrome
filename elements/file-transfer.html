@@ -1,0 +1,159 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../bower_components/core-item/core-item.html">
+<link rel="import" href="../bower_components/paper-spinner/paper-spinner.html">
+
+<polymer-element name="file-transfer-tag" devices="{{devices}}">
+  <template>
+    <style>
+      #canvas {
+        background-color: white;
+        margin-top: 10px;
+      }
+    </style>
+    <div horizontal layout>
+      <div flex>
+        <div>
+          <h3>Devices</h3>
+          <template repeat="{{device in devices}}">
+            <core-item label="Device: {{device.address}}">
+              <paper-button raised on-tap="{{connect}}" disabled?="{{state != 0}}">Connect</paper-button>
+              <paper-button raised on-tap="{{disconnect}}" disabled?="{{state != 3}}">Disconnect</paper-button>
+            </core-item>
+          </template>
+        </div>
+        <div vertical layout style="height:500px;">
+          <div>
+            <p>Connection Status: {{stateString}}</p>
+            <paper-button disabled?="{{state != 3 || waitingForRequest}}" raised on-tap="{{listFolder}}">List Folder</paper-button>
+            <paper-button disabled?="{{state != 3 || waitingForRequest}}" raised on-tap="{{parentFolder}}">Parent Folder</paper-button>
+            <paper-button disabled?="{{state != 3 || waitingForRequest}}" raised on-tap="{{rootFolder}}">Root Folder</paper-button>
+          </div>
+          <div flex style="overflow:scroll;">
+            <div hidden?="{{state != 3 || folderListing === undefined || waitingForRequest}}">
+              <h4 hidden?="{{folderListing.folders.length == 0}}">Folders</h4>
+              <template repeat="{{folder in folderListing.folders}}">
+                <core-item>
+                  <paper-button rasied on-tap="{{changeFolder}}">{{folder.name}}</paper-button>
+                </core-item>
+              </template>
+              <h4 hidden?="{{folderListing.files.length == 0}}">Files</h4>
+              <template repeat="{{file in folderListing.files}}">
+                <core-item label="{{file.name}}">
+                  <paper-button raised on-tap="{{getFile}}">View</paper-button>
+                  <paper-button raised on-tap="{{deleteFile}}">Delete</paper-button>
+                </core-item>
+              </template>
+            </div>
+            <div horizontal center-justified layout>
+              <paper-spinner style="margin-top:40px"active?="{{waitingForRequest}}"></paper-spinner>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <canvas id="canvas" height="574" width="395"></canvas>
+      </div>
+    </div>
+  </template>
+  <script>
+    Polymer('file-transfer-tag', {
+      // initialize the element's model
+      ready: function() {
+        this.fileTransferManager = SyncFileTransferManager.getInstance()
+        this.fileTransferManager.addObserver(this)
+        this.state = this.fileTransferManager.getState()
+        this.stateString = this.stringForState(this.state)
+        this.devices = this.fileTransferManager.getDevices()
+        this.folderListing = undefined
+        this.waitingForRequest = false
+        this.pageData = undefined
+        this.canvas = this.$.canvas
+        this.canvasContext = this.canvas.getContext('2d')
+      },
+      connect: function(event, detail, sender) {
+        var device = sender.templateInstance.model.device
+        this.fileTransferManager.connect(device.address)
+      },
+      disconnect: function(event, detail, sender) {
+        var device = sender.templateInstance.model.device
+        this.folderListing = undefined
+        this.fileTransferManager.disconnect(device.address)
+      },
+      parentFolder: function() {
+        this.fileTransferManager.changeFolder(this.devices[0], '..')
+        this.waitingForRequest = true
+      },
+      rootFolder: function() {
+        this.fileTransferManager.changeFolder(this.devices[0], '')
+        this.waitingForRequest = true
+      },
+      listFolder: function() {
+        this.fileTransferManager.listFolder(this.devices[0])
+        this.waitingForRequest = true
+      },
+      getFile: function(event, detail, sender) {
+        var file = sender.templateInstance.model.file
+        this.fileTransferManager.getFile(this.devices[0], file.name)
+        this.waitingForRequest = true
+      },
+      deleteFile: function(event, detail, sender) {
+        var file = sender.templateInstance.model.file
+        this.fileTransferManager.deleteFile(this.devices[0], file.name)
+        this.waitingForRequest = true
+      },
+      changeFolder: function(event, detail, sender) {
+        var folder = sender.templateInstance.model.folder
+        this.fileTransferManager.changeFolder(this.devices[0], folder.name)
+        this.waitingForRequest = true
+      },
+      stateChanged : function(oldState, newState) {
+        this.stateString = this.stringForState(newState)
+        this.state = newState
+      },
+      updatedDevices: function() {
+        this.devices = this.fileTransferManager.getDevices()
+      },
+      listedFolder: function(folderListing) {
+        this.folderListing = folderListing
+        this.waitingForRequest = false
+      },
+      changedFolder: function() {
+        this.fileTransferManager.listFolder(this.devices[0])
+      },
+      gotFile: function(file) {
+        this.waitingForRequest = false
+        this.pageData = file
+
+        // Render the PDF.
+        PDFJS.getDocument(this.pageData).then(function(pdf) {
+          pdf.getPage(1).then(function(page) {
+            var viewport = page.getViewport(1.0)
+            var fileTransferTag = document.querySelector('file-transfer-tag');
+            page.render({
+              canvasContext: fileTransferTag.canvasContext,
+              viewport: viewport
+            })
+          })
+        })
+      },
+      deletedFile: function(file) {
+        this.fileTransferManager.listFolder(this.devices[0])
+      },
+      stringForState: function(state) {
+        var states = this.fileTransferManager.states
+        switch(state) {
+          case states.CONNECTED:
+            return 'Connected'
+          case states.DISCONNECTED:
+            return 'Disconnected'
+          case states.CONNECTING:
+            return 'Connecting'
+          case states.DISCONNECTING:
+            return 'Disconnecting'
+        }
+        return 'N/A'
+      }
+    })
+  </script>
+</polymer-element>

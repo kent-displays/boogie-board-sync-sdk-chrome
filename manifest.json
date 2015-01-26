@@ -1,0 +1,23 @@
+{
+  "manifest_version": 2,
+  "name": "Sync SDK Example",
+  "description": "",
+  "version": "1.0.0",
+  "minimum_chrome_version": "37",
+  "icons": {},
+  "app": {
+    "background": {
+      "scripts": ["main.js"]
+    }
+  },
+  "permissions" : [
+    "hid",
+    {
+      "usbDevices": [ { "vendorId": 10516, "productId": 256 }, { "vendorId": 243, "productId": 256 } ]
+    }
+  ],
+  "bluetooth" : {
+    "uuids": [ "d6a56f80-88f8-11e3-baa8-0800200c9a66", "d6a56f81-88f8-11e3-baa8-0800200c9a66", "1106", "1124" ],
+    "socket": true
+  }
+}
