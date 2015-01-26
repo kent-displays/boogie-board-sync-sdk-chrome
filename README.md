@@ -1,4 +1,4 @@
-# Boogie Board Sync SDK for Chrome
+# [Boogie Board Sync](http://www.myboogieboard.com/products/boogie-board-sync-9.html) SDK for Chrome
 
 The software development kit provides a library for communicating with a Boogie Board Sync on the Chrome platform. This library allows developers to view, modify and retrieve aspects of the file system on the Sync. It also allows developers to retrieve real-time information including drawn paths, current position of the stylus and button presses.
 
