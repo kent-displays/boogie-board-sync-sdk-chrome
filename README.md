@@ -46,6 +46,8 @@ npm install -g grunt-cli
 grunt
 ```
 
+Then, load the app by following [these instructions](https://developer.chrome.com/apps/first_app#load) from inside of Chrome.
+
 ## Structure
 
 This is a quick overview on how the entire library and API are structured for use. __Highly recommend reading this before starting.__
@@ -66,9 +68,9 @@ This SDK uses the Obsever design pattern to inform the developer when calls to t
 
 ## Limitations
 
-- Chrome 37 or greater is required for ```SyncFileTransferManager```
+- Chrome >=37 is required for ```SyncFileTransferManager```
 - ```SyncFileTransferManager``` only works with Bluetooth connection
-- Chrome 39 or greater is required for ```SyncStreamingManager```
+- Chrome >=39 is required for ```SyncStreamingManager```
 - The ```SyncStreamingManager``` does not work on Chrome OS. This is due to the ```chrome.hid``` API not giving proper access to input devices. [Chromium Issue](https://code.google.com/p/chromium/issues/detail?id=443602)
 - The ```SyncStreamingManager``` does not work on OS X when there is an Apple Magic Mouse connected. [Chromium Issue](https://code.google.com/p/chromium/issues/detail?id=452172)
 
