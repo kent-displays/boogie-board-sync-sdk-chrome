@@ -72,7 +72,7 @@ This SDK uses the Obsever design pattern to inform the developer when calls to t
 - ```SyncFileTransferManager``` only works with Bluetooth connection
 - Chrome >=39 is required for ```SyncStreamingManager```
 - The ```SyncStreamingManager``` does not work on Chrome OS. This is due to the ```chrome.hid``` API not giving proper access to input devices. [Chromium Issue](https://code.google.com/p/chromium/issues/detail?id=443602)
-- The ```SyncStreamingManager``` does not work on OS X when there is an Apple Magic Mouse connected. [Chromium Issue](https://code.google.com/p/chromium/issues/detail?id=452172)
+- FIXED ~~The ```SyncStreamingManager``` does not work on OS X when there is multiple HID devices connected. [Chromium Issue](https://code.google.com/p/chromium/issues/detail?id=452172)~~
 
 ## Questions?
 
